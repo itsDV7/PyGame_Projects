@@ -44,11 +44,9 @@ def draw_menu(win, width, height, color, event=pg.event.Event(pg.KEYUP)):
         if event.type == pg.MOUSEBUTTONUP and event.button == 1:
             webbrowser.open(r"https://github.com/itsDV7/PyGame_Projects")
     if sp_button_rect.collidepoint(pg.mouse.get_pos()):
-        sp_button_font = BUTTON_FONT.render("AI UNDERWAY!", True, color["RED"])
-        sp_button_rect = pg.Rect(width // 2 - sp_button_font.get_width() // 2 - padding,
-                                 game_header_rect.y + game_header_rect.height + padding,
-                                 sp_button_font.get_width() + 2 * padding,
-                                 sp_button_font.get_height() + padding)
+        sp_button_font = BUTTON_FONT.render("1 PLAYER", True, color["RED"])
+        if event.type == pg.MOUSEBUTTONUP and event.button == 1:
+            return "1"
     if mp_button_rect.collidepoint(pg.mouse.get_pos()):
         mp_button_font = BUTTON_FONT.render("2 PLAYER", True, color["RED"])
         if event.type == pg.MOUSEBUTTONUP and event.button == 1:
