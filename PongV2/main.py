@@ -363,21 +363,21 @@ def handle_board_movement(keys, left_board, right_board, balls, ai):
             right_board.move(up=True)
 
         # Left Board AI (For Test Purposes)
-        close = math.inf
-        inc = -1
-        for i, ball in enumerate(balls):
-            if ball.x_vel <= 0:
-                if close >= abs(left_board.x - ball.x):
-                    close = abs(left_board.x - ball.x)
-                    inc = i
-        if inc == -1:
-            follow = balls[0]
-        else:
-            follow = balls[inc]
-        if follow.y > left_board.y + left_board.height//2:
-            left_board.move(down=True)
-        if follow.y < left_board.y + left_board.height//2:
-            left_board.move(up=True)
+        # close = math.inf
+        # inc = -1
+        # for i, ball in enumerate(balls):
+        #    if ball.x_vel <= 0:
+        #        if close >= abs(left_board.x - ball.x):
+        #            close = abs(left_board.x - ball.x)
+        #            inc = i
+        # if inc == -1:
+        #    follow = balls[0]
+        # else:
+        #    follow = balls[inc]
+        # if follow.y > left_board.y + left_board.height//2:
+        #    left_board.move(down=True)
+        # if follow.y < left_board.y + left_board.height//2:
+        #    left_board.move(up=True)
 
     else:
         if keys[pg.K_w]:
