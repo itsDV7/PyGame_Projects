@@ -1,14 +1,24 @@
+import os
 import pygame as pg
 import webbrowser
 pg.init()
 
+WIDTH, HEIGHT = (1280, 720)
+
 HEADER_FONT = pg.font.SysFont("Freshman", 250)
 BUTTON_FONT = pg.font.SysFont("Freshman", 100)
+
+BG_IMAGE_PATH = pg.image.load(os.path.join("Assets", "SpaceBG.png"))
+BG_IMAGE = pg.transform.scale(BG_IMAGE_PATH, (WIDTH, HEIGHT))
+
+POINTER_IMAGE_PATH = pg.image.load(os.path.join("Assets", "MousePointer.png"))
+POINTER_IMAGE = pg.transform.scale(POINTER_IMAGE_PATH, (40, 40))
 
 
 def draw_menu(win, width, height, color, event=pg.event.Event(pg.KEYUP)):
 
     win.fill(color["BLACK"])
+    win.blit(BG_IMAGE, (0, 0))
 
     game_header_font = HEADER_FONT.render("PONG v2", True, color["WHITE"])
     sp_button_font = BUTTON_FONT.render("1 PLAYER", True, color["WHITE"])
@@ -68,4 +78,4 @@ def draw_menu(win, width, height, color, event=pg.event.Event(pg.KEYUP)):
     win.blit(help_button_font, ((help_button_rect.x + padding), (help_button_rect.y + padding)))
     win.blit(quit_button_font, ((quit_button_rect.x + padding), (quit_button_rect.y + padding)))
 
-    pg.draw.circle(win, color["AQUA"], pg.mouse.get_pos(), 5)
+    win.blit(POINTER_IMAGE, (pg.mouse.get_pos()))
