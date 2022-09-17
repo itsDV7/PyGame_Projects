@@ -68,9 +68,7 @@ YELLOW_BALL = pg.transform.scale(YELLOW_BALL_IMAGE, (2*RADIUS + 6, 2*RADIUS + 6)
 RED_BALL = pg.transform.scale(RED_BALL_IMAGE, (2*RADIUS + 6, 2*RADIUS + 6))
 
 BOARD_IMAGE_PATH = pg.image.load(os.path.join("Assets", "Paddle.png"))
-# BOARD_IMAGE = pg.transform.scale(BOARD_IMAGE_PATH, (BOARD_WIDTH, BOARD_HEIGHT))
 SLOW_BOARD_IMAGE_PATH = pg.image.load(os.path.join("Assets", "SlowPaddle.png"))
-# SLOW_BOARD_IMAGE = pg.transform.scale(SLOW_BOARD_IMAGE_PATH, (BOARD_WIDTH, BOARD_HEIGHT))
 
 BG_IMAGE_PATH = pg.image.load(os.path.join("Assets", "SpaceBG.png"))
 BG_IMAGE = pg.transform.scale(BG_IMAGE_PATH, (WIDTH, HEIGHT))
