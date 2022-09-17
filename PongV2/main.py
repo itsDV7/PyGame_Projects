@@ -1,5 +1,6 @@
 import math
 import menu
+import os
 import pygame as pg
 import help
 from random import randint, choices, choice
@@ -12,6 +13,7 @@ pg.mouse.set_visible(False)
 WIDTH, HEIGHT = (1280, 720)
 BOARD_WIDTH, BOARD_HEIGHT = (20, 120)
 POWER_WIDTH, POWER_HEIGHT = (75, 75)
+RADIUS = 10
 WIN = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption("2 Player Pong! v2")
 CLOCK = pg.time.Clock()
@@ -53,9 +55,39 @@ SLOW_BOARD = pg.USEREVENT + 9
 
 # Fonts
 SCORE_FONT = pg.font.SysFont("Freshman", 400)
-SYMBOL_FONT = pg.font.SysFont("Freshman", 40)
+SYMBOL_FONT = pg.font.SysFont("Freshman", 60)
 PROMPT_FONT = pg.font.SysFont("Freshman", 100)
 PROMPT_FONT2 = pg.font.SysFont("Freshman", 40)
+
+# Assets
+GREEN_BALL_IMAGE = pg.image.load(os.path.join("Assets", "GreenBall.png"))
+YELLOW_BALL_IMAGE = pg.image.load(os.path.join("Assets", "YellowBall.png"))
+RED_BALL_IMAGE = pg.image.load(os.path.join("Assets", "RedBall.png"))
+GREEN_BALL = pg.transform.scale(GREEN_BALL_IMAGE, (2*RADIUS + 6, 2*RADIUS + 6))
+YELLOW_BALL = pg.transform.scale(YELLOW_BALL_IMAGE, (2*RADIUS + 6, 2*RADIUS + 6))
+RED_BALL = pg.transform.scale(RED_BALL_IMAGE, (2*RADIUS + 6, 2*RADIUS + 6))
+
+BOARD_IMAGE_PATH = pg.image.load(os.path.join("Assets", "Paddle.png"))
+# BOARD_IMAGE = pg.transform.scale(BOARD_IMAGE_PATH, (BOARD_WIDTH, BOARD_HEIGHT))
+SLOW_BOARD_IMAGE_PATH = pg.image.load(os.path.join("Assets", "SlowPaddle.png"))
+# SLOW_BOARD_IMAGE = pg.transform.scale(SLOW_BOARD_IMAGE_PATH, (BOARD_WIDTH, BOARD_HEIGHT))
+
+BG_IMAGE_PATH = pg.image.load(os.path.join("Assets", "SpaceBG.png"))
+BG_IMAGE = pg.transform.scale(BG_IMAGE_PATH, (WIDTH, HEIGHT))
+
+BLUE_BLOCK_PATH = pg.image.load(os.path.join("Assets", "BlueBlock.png"))
+BLUE_BLOCK2_PATH = pg.image.load(os.path.join("Assets", "BlueBlock2.png"))
+GREEN_BLOCK_PATH = pg.image.load(os.path.join("Assets", "GreenBlock.png"))
+ORANGE_BLOCK_PATH = pg.image.load(os.path.join("Assets", "OrangeBlock.png"))
+PINK_BLOCK_PATH = pg.image.load(os.path.join("Assets", "PinkBlock.png"))
+PINK_BLOCK2_PATH = pg.image.load(os.path.join("Assets", "BlueBlock2.png"))
+RED_BLOCK_PATH = pg.image.load(os.path.join("Assets", "RedBlock.png"))
+YELLOW_BLOCK_PATH = pg.image.load(os.path.join("Assets", "YellowBlock.png"))
+POINTER_IMAGE_PATH = pg.image.load(os.path.join("Assets", "MousePointer.png"))
+POINTER_IMAGE = pg.transform.scale(POINTER_IMAGE_PATH, (40, 40))
+
+BEEP_BOARD_SOUND = pg.mixer.Sound(os.path.join("Assets", "BeepBoard.ogg"))
+BEEP_WALL_SOUND = pg.mixer.Sound(os.path.join("Assets", "BeepWall.ogg"))
 
 
 class Board:
@@ -73,7 +105,12 @@ class Board:
     # Draw Board
     def draw(self, win):
         board_pos = pg.Rect(self.x, self.y, self.width, self.height)
-        pg.draw.rect(win, self.color, board_pos)
+        if self.color == COLOR["GRAY"]:
+            slow_board_image = pg.transform.scale(SLOW_BOARD_IMAGE_PATH, (self.width, self.height))
+            win.blit(slow_board_image, board_pos)
+        else:
+            board_image = pg.transform.scale(BOARD_IMAGE_PATH, (self.width, self.height))
+            win.blit(board_image, board_pos)
 
     # Board Movement
     def move(self, up=False, down=False):
@@ -114,7 +151,13 @@ class Ball:
     # Draw pong balls
     def draw(self, win):
         ball_pos = (self.x, self.y)
-        pg.draw.circle(win, self.color, ball_pos, self.radius)
+        image_pos = (ball_pos[0] - self.radius, ball_pos[1] - self.radius)
+        if self.color == COLOR["GREEN"]:
+            win.blit(GREEN_BALL, image_pos)
+        elif self.color == COLOR["YELLOW"]:
+            win.blit(YELLOW_BALL, image_pos)
+        elif self.color == COLOR["RED"]:
+            win.blit(RED_BALL, (image_pos[0]+5, image_pos[1]+5))
 
     # Pong balls movement
     def move(self):
@@ -142,54 +185,63 @@ class Powerups:
         self.symbol_color = ""
         self.width = POWER_WIDTH
         self.height = POWER_HEIGHT
+        self.test_blit = None
 
     # Expand -> + Board Length -> +
     def expand(self):
         self.symbol = "+"
         self.power_color = COLOR["GREEN2"]
-        self.symbol_color = COLOR["PINK"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = GREEN_BLOCK_PATH
 
     # Shrink -> - Board Length -> -
     def shrink(self):
         self.symbol = "-"
         self.power_color = COLOR["RED"]
-        self.symbol_color = COLOR["RED"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = ORANGE_BLOCK_PATH
 
     # Slow Board -> Slow Opponent -> S
     def slow_board(self):
         self.symbol = "S"
         self.power_color = COLOR["GREEN2"]
-        self.symbol_color = COLOR["PINK"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = PINK_BLOCK_PATH
 
     # Slow Ball -> Ball to Minimum speed -> 0
     def slow_ball(self):
         self.symbol = "0"
         self.power_color = COLOR["GREEN2"]
-        self.symbol_color = COLOR["PINK"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = PINK_BLOCK2_PATH
 
     # Extreme Ball -> Sudden Max Velocity -> Make ball Red -> F
     def extreme_ball(self):
         self.symbol = "F"
         self.power_color = COLOR["RED"]
-        self.symbol_color = COLOR["RED"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = RED_BLOCK_PATH
 
     # Double Ball -> Double the number of balls -> Switch y_vel -> D
     def double_ball(self):
         self.symbol = "D"
         self.power_color = COLOR["RED"]
-        self.symbol_color = COLOR["RED"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = YELLOW_BLOCK_PATH
 
     # Golden Ability -> -1 Point -> G
     def golden(self):
         self.symbol = "G"
         self.power_color = COLOR["GOLD"]
-        self.symbol_color = COLOR["GOLD"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = BLUE_BLOCK_PATH
 
     # Shield -> Ball cant pass -> P
     def shield(self):
         self.symbol = "P"
         self.power_color = COLOR["GOLD"]
-        self.symbol_color = COLOR["GOLD"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = BLUE_BLOCK2_PATH
 
     # Draw powerups
     def draw_powerup(self):
@@ -198,10 +250,10 @@ class Powerups:
         inner_rect_x_middle = (self.x + 5 + inner_rect.width // 2)
         inner_rect_y_middle = (self.y + 5 + inner_rect.height // 2)
         symbol = SYMBOL_FONT.render(str(self.symbol), True, self.symbol_color)
-        pg.draw.rect(self.win, self.power_color, outer_rect)
-        pg.draw.rect(self.win, COLOR["WHITE"], inner_rect)
-        self.win.blit(symbol, (inner_rect_x_middle - symbol.get_width()//2,
-                               inner_rect_y_middle - symbol.get_height()//2))
+        box = pg.transform.scale(self.test_blit, (outer_rect.width, outer_rect.height))
+        self.win.blit(box, (outer_rect.x, outer_rect.y))
+        self.win.blit(symbol, (inner_rect_x_middle - symbol.get_width() // 2,
+                               inner_rect_y_middle - symbol.get_height() // 2))
 
 
 class ApplyPowers:
@@ -290,9 +342,9 @@ def handle_board_movement(keys, left_board, right_board, balls, ai):
     # Handles board movements
     if ai:
         # Left Board Player
-        if keys[pg.K_w]:
+        if keys[pg.K_w] or keys[pg.K_UP]:
             left_board.move(up=True)
-        if keys[pg.K_s]:
+        if keys[pg.K_s] or keys[pg.K_DOWN]:
             left_board.move(down=True)
 
         # Right Board AI
@@ -313,21 +365,21 @@ def handle_board_movement(keys, left_board, right_board, balls, ai):
             right_board.move(up=True)
 
         # Left Board AI (For Test Purposes)
-        # close = math.inf
-        # inc = -1
-        # for i, ball in enumerate(balls):
-        #     if ball.x_vel <= 0:
-        #         if close >= abs(left_board.x - ball.x):
-        #             close = abs(left_board.x - ball.x)
-        #             inc = i
-        # if inc == -1:
-        #     follow = balls[0]
-        # else:
-        #     follow = balls[inc]
-        # if follow.y > left_board.y + left_board.height//2:
-        #     left_board.move(down=True)
-        # if follow.y < left_board.y + left_board.height//2:
-        #     left_board.move(up=True)
+        close = math.inf
+        inc = -1
+        for i, ball in enumerate(balls):
+            if ball.x_vel <= 0:
+                if close >= abs(left_board.x - ball.x):
+                    close = abs(left_board.x - ball.x)
+                    inc = i
+        if inc == -1:
+            follow = balls[0]
+        else:
+            follow = balls[inc]
+        if follow.y > left_board.y + left_board.height//2:
+            left_board.move(down=True)
+        if follow.y < left_board.y + left_board.height//2:
+            left_board.move(up=True)
 
     else:
         if keys[pg.K_w]:
@@ -410,17 +462,20 @@ def handle_ball_collision(balls, left_board, right_board, right_shield, left_shi
         # Collision with Ceil and Floor
         if (ball.y - ball.radius <= 0) or (ball.y + ball.radius >= HEIGHT):
             ball.y_vel *= -1
+            pg.mixer.Sound.play(BEEP_WALL_SOUND)
         # Right board collision and speed
         if right_board_rect.collidepoint(((ball.x + ball.radius), ball.y)):
             ball.x_vel, ball.y_vel = calculate_velocity(ball, right_board, keys)
             ball.x = right_board.x - ball.radius - 1
             HIT_COUNTER += 1
+            pg.mixer.Sound.play(BEEP_BOARD_SOUND)
             continue
         # Left board collision and speed
         if left_board_rect.collidepoint(((ball.x - ball.radius), ball.y)):
             ball.x_vel, ball.y_vel = calculate_velocity(ball, left_board, keys)
             ball.x = left_board.x + left_board.width + ball.radius + 1
             HIT_COUNTER += 1
+            pg.mixer.Sound.play(BEEP_BOARD_SOUND)
             continue
 
 
@@ -473,7 +528,7 @@ def powerup_randomizer():
         powerup.shield
     ]
     powerup_weights = [
-        50,
+        65,
         50,
         25,
         40,
@@ -500,6 +555,7 @@ def draw_assets(win, boards, balls, score_left, score_right, spawn_power, poweru
     global HIT_COUNTER
     # Draw all assets of the game
     win.fill(COLOR["BLACK"])
+    win.blit(BG_IMAGE, (0, 0))
     draw_dashed_line(win, COLOR["WHITE"], 0, HEIGHT, 5)
 
     # Renders
@@ -567,6 +623,7 @@ def draw_assets(win, boards, balls, score_left, score_right, spawn_power, poweru
             win.blit(right_paddle_help_text, ((WIDTH - right_paddle_help_text.get_width()), (HEIGHT//4)))
             win.blit(right_paddle_help_text2, ((WIDTH - right_paddle_help_text2.get_width()), (HEIGHT//2 + HEIGHT//4)))
         pg.draw.circle(win, COLOR["AQUA"], pg.mouse.get_pos(), 5)
+        win.blit(POINTER_IMAGE, (pg.mouse.get_pos()))
     # Show FPS
     fps = PROMPT_FONT2.render(f"FPS: {str(int(CLOCK.get_fps()))}", True, COLOR["GOLD"])
     win.blit(fps, (0, 0))
@@ -591,7 +648,7 @@ def main(ai):
         right_board.VEL = 20
     boards = [left_board, right_board]
     # Pong balls
-    ball = Ball(WIDTH//2, HEIGHT//2, 10)
+    ball = Ball(WIDTH//2, HEIGHT//2, RADIUS)
     balls = [ball]
     num_balls = len(balls)
     # Scores
