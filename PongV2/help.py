@@ -1,3 +1,4 @@
+import os
 import pygame as pg
 pg.init()
 
@@ -15,7 +16,17 @@ COLOR = {
     "GOLD": (255, 215, 0),
     "AQUA": (127, 255, 212)
 }
-SYMBOL_FONT = pg.font.SysFont("Freshman", 40)
+SYMBOL_FONT = pg.font.SysFont("Freshman", 60)
+BLUE_BLOCK_PATH = pg.image.load(os.path.join("Assets", "BlueBlock.png"))
+BLUE_BLOCK2_PATH = pg.image.load(os.path.join("Assets", "BlueBlock2.png"))
+GREEN_BLOCK_PATH = pg.image.load(os.path.join("Assets", "GreenBlock.png"))
+ORANGE_BLOCK_PATH = pg.image.load(os.path.join("Assets", "OrangeBlock.png"))
+PINK_BLOCK_PATH = pg.image.load(os.path.join("Assets", "PinkBlock.png"))
+PINK_BLOCK2_PATH = pg.image.load(os.path.join("Assets", "BlueBlock2.png"))
+RED_BLOCK_PATH = pg.image.load(os.path.join("Assets", "RedBlock.png"))
+YELLOW_BLOCK_PATH = pg.image.load(os.path.join("Assets", "YellowBlock.png"))
+POINTER_IMAGE_PATH = pg.image.load(os.path.join("Assets", "MousePointer.png"))
+POINTER_IMAGE = pg.transform.scale(POINTER_IMAGE_PATH, (40, 40))
 
 
 class Powerups:
@@ -29,54 +40,63 @@ class Powerups:
         self.symbol_color = ""
         self.width = POWER_WIDTH
         self.height = POWER_HEIGHT
+        self.test_blit = None
 
     # Expand -> + Board Length -> +
     def expand(self):
         self.symbol = "+"
         self.power_color = COLOR["GREEN2"]
-        self.symbol_color = COLOR["PINK"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = GREEN_BLOCK_PATH
 
     # Shrink -> - Board Length -> -
     def shrink(self):
         self.symbol = "-"
         self.power_color = COLOR["RED"]
-        self.symbol_color = COLOR["RED"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = ORANGE_BLOCK_PATH
 
     # Slow Board -> Slow Opponent -> S
     def slow_board(self):
         self.symbol = "S"
         self.power_color = COLOR["GREEN2"]
-        self.symbol_color = COLOR["PINK"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = PINK_BLOCK_PATH
 
     # Slow Ball -> Ball to Minimum speed -> 0
     def slow_ball(self):
         self.symbol = "0"
         self.power_color = COLOR["GREEN2"]
-        self.symbol_color = COLOR["PINK"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = PINK_BLOCK2_PATH
 
     # Extreme Ball -> Sudden Max Velocity -> Make ball Red -> F
     def extreme_ball(self):
         self.symbol = "F"
         self.power_color = COLOR["RED"]
-        self.symbol_color = COLOR["RED"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = RED_BLOCK_PATH
 
     # Double Ball -> Double the number of balls -> Switch y_vel -> D
     def double_ball(self):
         self.symbol = "D"
         self.power_color = COLOR["RED"]
-        self.symbol_color = COLOR["RED"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = YELLOW_BLOCK_PATH
 
     # Golden Ability -> -1 Point -> G
     def golden(self):
         self.symbol = "G"
         self.power_color = COLOR["GOLD"]
-        self.symbol_color = COLOR["GOLD"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = BLUE_BLOCK_PATH
 
     # Shield -> Ball cant pass -> P
     def shield(self):
         self.symbol = "P"
         self.power_color = COLOR["GOLD"]
-        self.symbol_color = COLOR["GOLD"]
+        self.symbol_color = COLOR["BLACK"]
+        self.test_blit = BLUE_BLOCK2_PATH
 
     # Draw powerups
     def draw_powerup(self):
@@ -85,10 +105,10 @@ class Powerups:
         inner_rect_x_middle = (self.x + 5 + inner_rect.width // 2)
         inner_rect_y_middle = (self.y + 5 + inner_rect.height // 2)
         symbol = SYMBOL_FONT.render(str(self.symbol), True, self.symbol_color)
-        pg.draw.rect(self.win, self.power_color, outer_rect)
-        pg.draw.rect(self.win, COLOR["WHITE"], inner_rect)
-        self.win.blit(symbol, (inner_rect_x_middle - symbol.get_width()//2,
-                               inner_rect_y_middle - symbol.get_height()//2))
+        box = pg.transform.scale(self.test_blit, (outer_rect.width, outer_rect.height))
+        self.win.blit(box, (outer_rect.x, outer_rect.y))
+        self.win.blit(symbol, (inner_rect_x_middle - symbol.get_width() // 2,
+                               inner_rect_y_middle - symbol.get_height() // 2))
 
 
 def draw_help(win, width, height, color, event=pg.event.Event(pg.KEYUP)):
@@ -180,4 +200,4 @@ def draw_help(win, width, height, color, event=pg.event.Event(pg.KEYUP)):
 
     win.blit(back_button_font, ((back_button_rect.x + padding), (back_button_rect.y + padding)))
 
-    pg.draw.circle(win, color["AQUA"], pg.mouse.get_pos(), 5)
+    win.blit(POINTER_IMAGE, (pg.mouse.get_pos()))
